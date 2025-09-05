@@ -23,7 +23,20 @@ exports.handler = async (event, context) => {
       data = JSON.parse(fs.readFileSync(DATA_FILE));
     }
     
-    const { id } = JSON.parse(event.body);
+    const body = event.body ? JSON.parse(event.body) : {};
+    const { id } = body;
+    
+    if (!id) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ error: 'Missing ID' })
+      };
+    }
+    
     data.trainings = data.trainings.filter(t => t.id !== id);
     data.participants = data.participants.filter(p => p.training_id !== id);
     
@@ -38,6 +51,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ success: true })
     };
   } catch (error) {
+    console.error('Error:', error);
     return {
       statusCode: 500,
       headers: {
