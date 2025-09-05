@@ -23,7 +23,20 @@ exports.handler = async (event, context) => {
       data = JSON.parse(fs.readFileSync(DATA_FILE));
     }
     
-    const { training_id, name } = JSON.parse(event.body);
+    const body = event.body ? JSON.parse(event.body) : {};
+    const { training_id, name } = body;
+    
+    if (!training_id || !name) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ error: 'Missing required fields' })
+      };
+    }
+    
     data.participants.push({ training_id, name });
     
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
@@ -37,6 +50,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ success: true })
     };
   } catch (error) {
+    console.error('Error:', error);
     return {
       statusCode: 500,
       headers: {
