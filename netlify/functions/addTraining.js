@@ -24,6 +24,7 @@ exports.handler = async (event, context) => {
       data = JSON.parse(fs.readFileSync(DATA_FILE));
     }
     
+    // Проверка тела запроса
     const body = event.body ? JSON.parse(event.body) : {};
     const { id, title, date, group, desc } = body;
     
